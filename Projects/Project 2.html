@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors (Error-Protected)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .game-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .choices {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+        }
+        
+        .choice {
+            font-size: 50px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 10px;
+            border-radius: 50%;
+        }
+        
+        .choice:hover {
+            transform: scale(1.1);
+            background-color: #f0f0f0;
+        }
+        
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .score {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .score-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 5px;
+            transition: all 0.3s;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            margin: 10px 0;
+            min-height: 20px;
+        }
+        
+        .win { color: #27ae60; animation: pulse 0.5s; }
+        .lose { color: #e74c3c; animation: shake 0.5s; }
+        .tie { color: #f39c12; }
+        .score-update { animation: bounce 0.5s; color: #3498db; }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Rock Paper Scissors</h1>
+        <div id="error" class="error-message"></div>
+        
+        <div class="scoreboard">
+    <div class="score">
+        <span class="score-label">Wins</span>
+        <span id="wins" class="score-value">0</span>
+    </div>
+    <div class="score">
+        <span class="score-label">Losses</span>
+        <span id="losses" class="score-value">0</span>
+    </div>
+    <div class="score">
+        <span class="score-label">Ties</span>
+        <span id="ties" class="score-value">0</span>
+    </div>
+</div>
+        
+        <div class="choices">
+            <button class="choice" data-choice="rock">✊</button>
+            <button class="choice" data-choice="paper">✋</button>
+            <button class="choice" data-choice="scissors">✌️</button>
+        </div>
+        
+        <div id="result">Choose your move!</div>
+        <button id="reset">Reset Game</button>
+    </div>
+
+    <script>
+        // Error handling wrapper
+        function handleErrors() {
+            try {
+                // DOM elements
+                const errorEl = document.getElementById('error');
+                const choices = document.querySelectorAll('.choice');
+                const resultEl = document.getElementById('result');
+                const resetBtn = document.getElementById('reset');
+                const winsEl = document.getElementById('wins');
+                const lossesEl = document.getElementById('losses');
+                const tiesEl = document.getElementById('ties');
+                
+                // Validate DOM elements exist
+                if (!errorEl || !choices.length || !resultEl || !resetBtn || !winsEl || !lossesEl || !tiesEl) {
+                    throw new Error('Critical DOM elements missing');
+                }
+                
+                // Game state with default values
+                let scores = {
+                    wins: 0,
+                    losses: 0,
+                    ties: 0
+                };
+                
+                // Initialize game
+                function init() {
+                    try {
+                        // Load scores from localStorage if available
+                        const savedScores = localStorage.getItem('rps-scores');
+                        if (savedScores) {
+                            scores = validateScores(JSON.parse(savedScores));
+                        }
+                        updateScoreboard();
+                        
+                        // Set up event listeners
+                        choices.forEach(choice => {
+                            choice.addEventListener('click', playGame);
+                        });
+                        
+                        resetBtn.addEventListener('click', resetGame);
+                        
+                    } catch (e) {
+                        logError('Initialization failed', e);
+                        resetGame(); // Fallback to default state
+                    }
+                }
+                
+                // Main game function
+                function playGame(e) {
+                    try {
+                        clearError();
+                        const playerChoice = validateChoice(e.target.dataset.choice);
+                        const computerChoice = getComputerChoice();
+                        const winner = determineWinner(playerChoice, computerChoice);
+                        
+                        updateGameState(winner, playerChoice, computerChoice);
+                        
+                    } catch (e) {
+                        logError('Game play error', e);
+                    }
+                }
+                
+                // Validate scores from storage
+                function validateScores(savedScores) {
+                    if (!savedScores || 
+                        typeof savedScores.wins !== 'number' || 
+                        typeof savedScores.losses !== 'number' || 
+                        typeof savedScores.ties !== 'number') {
+                        throw new Error('Invalid saved scores format');
+                    }
+                    return {
+                        wins: Math.max(0, savedScores.wins),
+                        losses: Math.max(0, savedScores.losses),
+                        ties: Math.max(0, savedScores.ties)
+                    };
+                }
+                
+                // Validate player choice
+                function validateChoice(choice) {
+                    const validChoices = ['rock', 'paper', 'scissors'];
+                    if (!validChoices.includes(choice)) {
+                        throw new Error(`Invalid choice: ${choice}`);
+                    }
+                    return choice;
+                }
+                
+                // Get computer's random choice
+                function getComputerChoice() {
+                    const choices = ['rock', 'paper', 'scissors'];
+                    const randomIndex = Math.floor(Math.random() * 3);
+                    return choices[randomIndex];
+                }
+                
+                // Determine the winner
+                function determineWinner(player, computer) {
+                    if (player === computer) return 'tie';
+                    
+                    if (
+                        (player === 'rock' && computer === 'scissors') ||
+                        (player === 'paper' && computer === 'rock') ||
+                        (player === 'scissors' && computer === 'paper')
+                    ) {
+                        return 'player';
+                    }
+                    return 'computer';
+                }
+                
+                // Update game state
+                function updateGameState(winner, playerChoice, computerChoice) {
+                    try {
+                        // Update scores
+                        if (winner === 'player') {
+                            scores.wins++;
+                            resultEl.textContent = `You win! ${getEmoji(playerChoice)} beats ${getEmoji(computerChoice)}`;
+                            resultEl.className = 'win';
+                            winsEl.classList.add('score-update');
+                        } else if (winner === 'computer') {
+                            scores.losses++;
+                            resultEl.textContent = `You lose! ${getEmoji(computerChoice)} beats ${getEmoji(playerChoice)}`;
+                            resultEl.className = 'lose';
+                            lossesEl.classList.add('score-update');
+                        } else {
+                            scores.ties++;
+                            resultEl.textContent = `It's a tie! Both chose ${getEmoji(playerChoice)}`;
+                            resultEl.className = 'tie';
+                            tiesEl.classList.add('score-update');
+                        }
+                        
+                        updateScoreboard();
+                        saveScores();
+                        
+                        // Remove animation class after it completes
+                        setTimeout(() => {
+                            winsEl.classList.remove('score-update');
+                            lossesEl.classList.remove('score-update');
+                            tiesEl.classList.remove('score-update');
+                        }, 500);
+                        
+                    } catch (e) {
+                        logError('State update failed', e);
+                    }
+                }
+                
+                // Update scoreboard display
+                function updateScoreboard() {
+                    winsEl.textContent = scores.wins;
+                    lossesEl.textContent = scores.losses;
+                    tiesEl.textContent = scores.ties;
+                }
+                
+                // Reset game state
+                function resetGame() {
+                    try {
+                        scores = {
+                            wins: 0,
+                            losses: 0,
+                            ties: 0
+                        };
+                        updateScoreboard();
+                        resultEl.textContent = 'Choose your move!';
+                        resultEl.className = '';
+                        localStorage.removeItem('rps-scores');
+                        clearError();
+                    } catch (e) {
+                        logError('Reset failed', e);
+                    }
+                }
+                
+                // Save scores to localStorage
+                function saveScores() {
+                    try {
+                        localStorage.setItem('rps-scores', JSON.stringify(scores));
+                    } catch (e) {
+                        logError('Failed to save scores', e);
+                    }
+                }
+                
+                // Get emoji for choice
+                function getEmoji(choice) {
+                    const emojis = {
+                        rock: '✊',
+                        paper: '✋',
+                        scissors: '✌️'
+                    };
+                    return emojis[choice] || choice;
+                }
+                
+                // Error logging
+                function logError(message, error) {
+                    console.error(message, error);
+                    errorEl.textContent = `Error: ${message}. Please try again.`;
+                    if (error instanceof Error) {
+                        errorEl.textContent += ` (${error.message})`;
+                    }
+                }
+                
+                function clearError() {
+                    errorEl.textContent = '';
+                }
+                
+                // Initialize the game when DOM is loaded
+                document.addEventListener('DOMContentLoaded', init);
+                
+            } catch (e) {
+                console.error('Fatal error during game setup:', e);
+                document.body.innerHTML = `
+                    <div style="color: red; padding: 20px; text-align: center;">
+                        <h1>Application Error</h1>
+                        <p>Sorry, the game failed to load properly.</p>
+                        <p>${e.message}</p>
+                        <button onclick="window.location.reload()">Reload Game</button>
+                    </div>
+                `;
+            }
+        }
+        
+        // Start the game with error handling
+        handleErrors();
+    </script>
+</body>
+</html>
