@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flatland Evolution</title>
+    <meta name="author" content="Michael Borck">
+    <meta name="description" content="Evolution of the Flatland interactive square">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        h2 {
+            margin-top: 40px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        .version-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        #square, .square {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            background-color: red;
+            cursor: pointer;
+        }
+        .code {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Flatland: Evolution of an Interactive Square</h1>
+    
+    <!-- Version 1 -->
+    <div class="version-container">
+        <h2>Version 1: Basic Background Change</h2>
+        <div class="code">
+            &lt;script&gt;
+                document.body.style.background = "green";
+            &lt;/script&gt;
+        </div>
+        <p>This version simply changes the entire page background to green on load.</p>
+        <script>
+            // Version 1 behavior
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelector('#version1').style.background = "green";
+            });
+        </script>
+        <div id="version1" style="width:100%; height:50px; background:red;"></div>
+    </div>
+    
+    <!-- Version 2 -->
+    <div class="version-container">
+        <h2>Version 2: Click to Change Color</h2>
+        <div class="code">
+            &lt;div id="square" onclick="document.getElementById('square').style.background = 'green'"&gt;&lt;/div&gt;
+        </div>
+        <p>Now the square changes to green when clicked.</p>
+        <div class="square" onclick="document.getElementById('version2').style.background = 'green'"></div>
+        <div id="version2" class="square"></div>
+    </div>
+    
+    <!-- Version 3 -->
+    <div class="version-container">
+        <h2>Version 3: Mouse Events with Separate Functions</h2>
+        <div class="code">
+            &lt;div id="square" onclick="makeGreen()" onmouseover="makeGray()" onmouseout="makeRed()"&gt;&lt;/div&gt;
+            
+            &lt;script&gt;
+                function makeGreen() {
+                    document.getElementById('square').style.background = "green";
+                }
+                function makeGray() {
+                    document.getElementById('square').style.background = "gray";
+                }
+                function makeRed() {
+                    document.getElementById('square').style.background = "red";
+                }
+            &lt;/script&gt;
+        </div>
+        <p>Added mouseover (gray) and mouseout (red) events with separate functions.</p>
+        <div id="version3" class="square" 
+             onclick="makeGreenV3()" 
+             onmouseover="makeGrayV3()" 
+             onmouseout="makeRedV3()"></div>
+        <script>
+            function makeGreenV3() { document.getElementById('version3').style.background = "green"; }
+            function makeGrayV3() { document.getElementById('version3').style.background = "gray"; }
+            function makeRedV3() { document.getElementById('version3').style.background = "red"; }
+        </script>
+    </div>
+    
+    <!-- Version 4 -->
+    <div class="version-container">
+        <h2>Version 4: Consolidated Color Function</h2>
+        <div class="code">
+            &lt;div id="square" onclick="changeColour('green')" onmouseover="changeColour('gray')" onmouseout="changeColour('red')"&gt;&lt;/div&gt;
+            
+            &lt;script&gt;
+                let square = document.getElementById('square');
+                
+                function changeColour(colour) {
+                    square.style.background = colour;
+                }
+            &lt;/script&gt;
+        </div>
+        <p>Consolidated to a single color-changing function with parameter.</p>
+        <div id="version4" class="square" 
+             onclick="changeColourV4('green')" 
+             onmouseover="changeColourV4('gray')" 
+             onmouseout="changeColourV4('red')"></div>
+        <script>
+            let squareV4 = document.getElementById('version4');
+            function changeColourV4(colour) {
+                squareV4.style.background = colour;
+            }
+        </script>
+    </div>
+    
+    <!-- Version 5 -->
+    <div class="version-container">
+        <h2>Version 5: Event Listeners in JavaScript</h2>
+        <div class="code">
+            &lt;script&gt;
+                let square = document.getElementById('square');
+                
+                square.addEventListener('click', (event) => changeColour('green'));
+                square.addEventListener('mouseover', (event) => changeColour('gray'));
+                square.addEventListener('mouseout', (event) => changeColour('red'));
+                
+                function changeColour(colour) {
+                    square.style.background = colour;
+                }
+            &lt;/script&gt;
+        </div>
+        <p>Moved event handlers from HTML to JavaScript using addEventListener.</p>
+        <div id="version5" class="square"></div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                let squareV5 = document.getElementById('version5');
+                
+                squareV5.addEventListener('click', (event) => changeColourV5('green'));
+                squareV5.addEventListener('mouseover', (event) => changeColourV5('gray'));
+                squareV5.addEventListener('mouseout', (event) => changeColourV5('red'));
+                
+                function changeColourV5(colour) {
+                    squareV5.style.background = colour;
+                }
+            });
+        </script>
+    </div>
+    
+    <!-- Version 6 -->
+    <div class="version-container">
+        <h2>Version 6: Dynamic Content Loading</h2>
+        <div class="code">
+            &lt;body onload="greeting()"&gt;
+                &lt;div id="words"&gt;&lt;!-- Text Will Go Here --&gt;&lt;/div&gt;
+                
+            &lt;script&gt;
+                function greeting() {
+                    words.innerHTML = "Welcome to Flatland.&lt;br&gt; I am Square.";
+                }
+            &lt;/script&gt;
+        </div>
+        <p>Added dynamic content loading on page load.</p>
+        <div id="version6-words"></div>
+        <div id="version6" class="square"></div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                let squareV6 = document.getElementById('version6');
+                let wordsV6 = document.getElementById('version6-words');
+                
+                squareV6.addEventListener('click', (event) => changeColourV6('green'));
+                squareV6.addEventListener('mouseover', (event) => changeColourV6('gray'));
+                squareV6.addEventListener('mouseout', (event) => changeColourV6('red'));
+                
+                function changeColourV6(colour) {
+                    squareV6.style.background = colour;
+                }
+                
+                // Dynamic content
+                wordsV6.innerHTML = "Welcome to Flatland.<br>I am Square.";
+            });
+        </script>
+    </div>
+    
+    <!-- Version 7 -->
+    <div class="version-container">
+        <h2>Version 7: JavaScript-Only Event Binding</h2>
+        <div class="code">
+            &lt;script&gt;
+                document.onload = greeting();
+                
+                function greeting() {
+                    words.innerHTML = "Welcome to Flatland.&lt;br&gt; I am Square.";
+                }
+            &lt;/script&gt;
+        </div>
+        <p>Moved all event binding to JavaScript (no onload in HTML).</p>
+        <div id="version7-words"></div>
+        <div id="version7" class="square"></div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                let squareV7 = document.getElementById('version7');
+                let wordsV7 = document.getElementById('version7-words');
+                
+                squareV7.addEventListener('click', (event) => changeColourV7('green'));
+                squareV7.addEventListener('mouseover', (event) => changeColourV7('gray'));
+                squareV7.addEventListener('mouseout', (event) => changeColourV7('red'));
+                
+                function changeColourV7(colour) {
+                    squareV7.style.background = colour;
+                }
+                
+                // Dynamic content
+                wordsV7.innerHTML = "Welcome to Flatland.<br>I am Square.";
+                console.log("Welcome to Flatland. I am Square.");
+            });
+        </script>
+    </div>
+    
+    <!-- Version 8 -->
+    <div class="version-container">
+        <h2>Version 8: External JavaScript File</h2>
+        <div class="code">
+            &lt;script src="script.js"&gt;&lt;/script&gt;
+        </div>
+        <p>Final version with all JavaScript in external file (simulated here).</p>
+        <div id="version8-words"></div>
+        <div id="version8" class="square"></div>
+        <script>
+            // This would normally be in script.js
+            document.addEventListener('DOMContentLoaded', function() {
+                let squareV8 = document.getElementById('version8');
+                let wordsV8 = document.getElementById('version8-words');
+                
+                squareV8.addEventListener('click', (event) => changeColourV8('green'));
+                squareV8.addEventListener('mouseover', (event) => changeColourV8('gray'));
+                squareV8.addEventListener('mouseout', (event) => changeColourV8('red'));
+                
+                function changeColourV8(colour) {
+                    squareV8.style.background = colour;
+                }
+                
+                // Dynamic content
+                wordsV8.innerHTML = "Welcome to Flatland.<br>I am Square.";
+            });
+        </script>
+    </div>
+</body>
+</html>

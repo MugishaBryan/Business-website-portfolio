@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Flatland</title>
+    <meta name="author" content="Michael Borck">
+    <meta name="description" content="Explore flatland and interact with its inhabitants">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+
+<body onload="console.log('Welcome to Flatland. I am Square.');">
+    <div id="words">
+        <!-- Text Will Go Here -->
+    </div>
+    <div id="square"></div>
+
+
+    <script >
+        /* Find elements in DOM tree, assign to variable (best practice) */
+        let square = document.getElementById('square');
+
+        /* Add/link function to handle events */
+        square.addEventListener('click', (event) => changeColour('green'));
+        /* Create 'hover' effect, better here or in CSS? */
+        square.addEventListener('mouseover', (event) => changeColour('gray'));
+        square.addEventListener('mouseout', (event) => changeColour('red'));
+
+        function changeColour(colour) {
+            square.style.background = colour;
+        }
+    </script>
+</body>
+
+</html>

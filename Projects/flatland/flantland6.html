@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Flatland</title>
+    <meta name="author" content="Michael Borck">
+    <meta name="description" content="Explore flatland and interact with its inhabitants">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<!-- 'onload' working, lets change some content within the DOM tree 
+
+    Add 'content' when on load event, why not have content in HTML?. Should this
+    be here or in the HTML?  Perhaps if dynamically generated, loaded from
+    database might make more sense, perhaps static text should just be in the
+    HTML. More just questions, ideas to demonstrate and get them thinking about
+    'Separation of Concerns' ideal vs reality 
+
+    First, add event in HTML!  'onload' event (note event only triggers with
+    window, document, html or body)
+
+    see: https://www.w3schools.com/jsref/event_onload.asp
+    Note: Going to do more advance manipulation next week
+-->
+<body onload="greeting()">
+    <div id="words">
+        <!-- Text Will Go Here -->
+    </div>
+    <div id="square"></div>
+
+
+    <script>
+        /* Find elements in DOM tree, assign to variable (best practice) */
+        let square = document.getElementById('square');
+
+        /* Add/link function to handle events */
+        square.addEventListener('click', (event) => changeColour('green'));
+        /* Create 'hover' effect, better here or in CSS? */
+        square.addEventListener('mouseover', (event) => changeColour('gray'));
+        square.addEventListener('mouseout', (event) => changeColour('red'));
+
+        function changeColour(colour) {
+            square.style.background = colour;
+        }
+
+        /* Find part of DOM we want to update */
+        let words = document.getElementById('words');
+
+        function greeting() {
+            //console.log("Welcome to Flatland. I am Square.");
+            /* innerText, innerContent, innerHTML, difference, best? */
+            words.innerHTML = "Welcome to Flatland.<br> I am Square.";
+        }
+    </script>
+</body>
+
+</html>

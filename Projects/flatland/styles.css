@@ -1,0 +1,31 @@
+/* Name: style.css
+   Author: Michael Borck, michael.borck@curtin.edu.au
+   Description: Styling for Flatland
+   Version: 1.0
+*/
+body {
+    font-family: "Helvetica", "Arial", sans-serif;
+    box-sizing: border-box;
+    padding-top: 40px;
+    width: 550px;
+    margin: 0 auto;
+  }
+  
+  #square {
+    float:left;
+    width: 200px;
+    height: 200px;
+    background: red;
+  }
+  
+  #words {
+    float: left;
+    width: 250px;
+    height: 200px;
+    font-size: 25px;
+    text-align: right;
+    padding: 5px;
+    margin-right: 10px;
+    border-radius: 10%;
+    border-right: 5px solid red;
+  }
