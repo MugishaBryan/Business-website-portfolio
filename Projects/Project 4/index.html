@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced RSS Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1><i class="fas fa-rss"></i> RSS Dashboard</h1>
+            <div class="feed-selector">
+                <select id="feed-select">
+                    <option value="">Select a feed...</option>
+                    <option value="https://hacks.mozilla.org/feed/">Mozilla Hacks</option>
+                    <option value="http://feeds.bbci.co.uk/news/world/rss.xml">BBC World News</option>
+                    <option value="https://techcrunch.com/feed/">TechCrunch</option>
+                </select>
+                <button id="refresh-btn"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div id="loading" class="loading-indicator">
+                <i class="fas fa-spinner fa-spin"></i> Loading feed...
+            </div>
+            <div id="error-message" class="error-message"></div>
+            <div id="feed-container" class="feed-container"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
